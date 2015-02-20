@@ -395,6 +395,7 @@ class Bootloader:
 		
 		repeats = 0
 		finished = False
+		wrong_response_counter = 0
 		
 		# clear message queue to delete messages belonging to another
 		# transmission
@@ -434,6 +435,12 @@ class Bootloader:
 							if message.number == 0:
 								self.msg_number = response_msg.number
 								message.number = self.msg_number
+							else:
+								wrong_response_counter += 1
+
+								if wrong_response_counter <= attempts:
+									print "Warning: Ignore this message and try to catch the next"
+									continue
 							
 							# wait a bit for other error message
 							time.sleep(0.1)
