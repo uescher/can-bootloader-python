@@ -451,7 +451,7 @@ class Bootloader:
 						self.debug("Warning: Discarding obviously old message (received %i/%x, I have %i/%x)" % (response_msg.subject, response_msg.number, message.subject, message.number))
 			
 			repeats += 1
-			if attempts > 0 and repeats >= attempts:
+			if attempts > 0 and repeats >= attempts and finished == False:
 				raise BootloaderException("No response after %i attempts and timeout %i while sending '%s'" % (repeats, timeout, message))
 		
 		# increment the message number
