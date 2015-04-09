@@ -554,7 +554,7 @@ if __name__ == '__main__':
 	
 	(options, args) = parser.parse_args()
 	
-	if not options.filename or not options.id:
+	if not ( options.filename or options.config) or not options.id:
 		print parser.get_usage()
 		exit(1)
 	
@@ -569,11 +569,12 @@ if __name__ == '__main__':
 	
 	print "File      : %s" % options.filename
 	
-	hexfile = intelhex.IntelHexParser(options.filename)
-	if len(hexfile.segments) > 1:
-		print "            File has %i segments %s bytes" % (len(hexfile.segments), map(lambda x: len(x), hexfile.segments))
+	if options.filename:
+		hexfile = intelhex.IntelHexParser(options.filename)
+		if len(hexfile.segments) > 1:
+			print "            File has %i segments %s bytes" % (len(hexfile.segments), map(lambda x: len(x), hexfile.segments))
 	
-	print "Size      : %i Bytes" % reduce(lambda x,y: x + y, map(lambda x: len(x), hexfile.segments))
+		print "Size      : %i Bytes" % reduce(lambda x,y: x + y, map(lambda x: len(x), hexfile.segments))
 	
 	# create a connection to the can bus
 	if options.type == "can2usb":
@@ -594,7 +595,12 @@ if __name__ == '__main__':
 	
 	try:
 		bootloader = CommandlineClient(board_id, interface, debug = debug_mode)
-		bootloader.program(hexfile.segments)
+		if options.config:
+			bootloader.identify()
+			print bootloader.board
+			bootloader.start_app()
+		else:
+			bootloader.program(hexfile.segments)
 	except BootloaderException, msg:
 		print "Error: %s" % msg
 	except KeyboardInterrupt, msg:
